@@ -1,0 +1,25 @@
+
+instalar mysql y entity framework: 
+
+dotnet add package Pomelo.EntityFrameworkCore.MySql --version 7.0.0
+dotnet add package Microsoft.EntityFrameworkCore.Design
+
+instalar ef tools globalmente
+
+dotnet tool install --global dotnet-ef
+
+
+migraciones: 
+dotnet ef migrations add UpdateDatabaseConfig
+dotnet ef database update
+
+problemas
+dotnet restore
+
+
+versiones correctas: 
+dotnet add package Pomelo.EntityFrameworkCore.MySql --version 8.0.0
+dotnet add package Microsoft.EntityFrameworkCore --version 8.0.0
+dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.0
+dotnet add package Microsoft.EntityFrameworkCore.Tools --version 8.0.0
+

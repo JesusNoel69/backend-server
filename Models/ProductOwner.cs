@@ -6,6 +6,6 @@ namespace BackEnd_Server.Models
     {
         [StringLength(100, ErrorMessage = "La longitud máxima es de 100 caracteres.")]
         public string? StakeHolderContact { get; set; }
-        public Team? Teams { get; set; }
+        public Team? Team { get; set; }
     }
 }

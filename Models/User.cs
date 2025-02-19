@@ -13,8 +13,6 @@ namespace BackEnd_Server.Models
         public string? Account { get; set; }
         [StringLength(50, ErrorMessage = "La longitud máxima es de 50 caracteres.")]
         public string? Password { get; set; }
-        public ProductOwner? ProductOwner { get; set; }
-        public Developer? Developer { get; set; }
         public ChangeDetails? ChangeDetails { get; set; }
     }
 }

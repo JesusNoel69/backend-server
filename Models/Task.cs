@@ -15,5 +15,6 @@ namespace BackEnd_Server.Models
         public List<ChangeDetails>? ChangeDetails { get; set; }
         public Sprint? Sprint { get; set; }
         public ProductBacklog? ProductBacklog { get; set; }
+        public List<WeeklyScrum>? WeeklyScrums { get; set; }
     }
 }

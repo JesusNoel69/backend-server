@@ -14,7 +14,7 @@ namespace BackEnd_Server.Models
         public string? ServerImage { get; set; }
         public int ProjectNumber { get; set; }
         public List<Sprint>? Sprints { get; set; }
-        public TeamProject? TeamProject { get; set; }
+        public List<TeamProject>? TeamProjects { get; set; }
         public ProductBacklog? ProductBacklog { get; set; }
     }
 }

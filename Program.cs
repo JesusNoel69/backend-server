@@ -1,5 +1,8 @@
-var builder = WebApplication.CreateBuilder(args);
+using BackEnd_Server.Data;
+using Microsoft.EntityFrameworkCore;
 
+var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
@@ -10,6 +13,9 @@ builder.Services.AddCors(options =>
              .AllowAnyMethod();
    });
 });
+
+builder.Services.AddDbContext<AplicationDbContext>(options=>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
