@@ -1,6 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using BackEnd_Server.Models;
+/*
+mydomaint6b
+vE3jI2y7
+*/
+/*
+    "DefaultConnection": "server=localhost;port=3306;database=scrum_db;user=root;password=6016681;"
+
+*/
 
 namespace BackEnd_Server.Data
 {

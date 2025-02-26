@@ -490,3 +490,4 @@ obj/
 *.user
 *.suo
 *.vs
+.env
