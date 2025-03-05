@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BackEnd_Server.Models
 {
@@ -6,6 +7,7 @@ namespace BackEnd_Server.Models
     {
         [StringLength(100, ErrorMessage = "La longitud máxima es de 100 caracteres.")]
         public string? StakeHolderContact { get; set; }
+        [JsonIgnore]
         public Team? Team { get; set; }
     }
 }

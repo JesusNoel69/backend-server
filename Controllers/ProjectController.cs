@@ -32,18 +32,33 @@ namespace BackEnd_Server.Controllers
             }
             return Ok(projects);
         }
-       [HttpPost("InsertProject")]
-        public async Task<ActionResult<Project>> InsertProject([FromBody]Project project)
+        
+        [HttpPost("InsertProject")]
+        public async Task<ActionResult<Project>> InsertProject([FromBody] Project project)
         {
-            // Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(project));
+            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(project));
+
+            // Aseguramos que la lista TeamProjects no sea nula
+            project.TeamProjects ??= [];
+            
+            // Para cada relación, asignamos la referencia al proyecto
+            foreach (var tp in project.TeamProjects)
+            {
+                tp.Project = project;
+            }
+            if(project.ProductBacklog != null)
+            {
+                project.ProductBacklog.Project = project;
+                 _context.ProductBacklog.Add(project.ProductBacklog);
+            }
+
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                _context.Project.Add(project);
-                
+                await _context.Project.AddAsync(project);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
-                return Ok();//CreatedAtAction(nameof(GetProjectById), new { id = project.Id }, project);
+                return Ok(project);
             }
             catch (Exception ex)
             {
@@ -52,7 +67,7 @@ namespace BackEnd_Server.Controllers
                 return StatusCode(500, new { message = "Error al insertar el proyecto", error = ex.Message });
             }
         }
-      
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Project>> GetProjectById(int id)
         {
@@ -63,6 +78,26 @@ namespace BackEnd_Server.Controllers
             }
             return Ok(project);
         }
+
+       [HttpGet("GetProductBacklogById/{projectId}")]
+        public async Task<ActionResult<ProductBacklog>> GetProductBacklogById(int projectId)
+        {
+            System.Console.WriteLine(projectId);
+            var backlog = await _context.ProductBacklog.FirstOrDefaultAsync(pb => pb.ProjectId == projectId);
+            if (backlog == null)
+            {
+                return NotFound();
+            }
+
+            // Asignar las tareas al backlog, incluso si la lista queda vacía
+            backlog.Tasks = await _context.TaskEntity
+                .Where(task => task.ProductBacklog != null && task.ProductBacklog.Id == backlog.Id)
+                .ToListAsync();
+            
+            // En lugar de retornar NotFound si no hay tareas, retornamos el backlog (con Tasks vacía)
+            return Ok(backlog);
+        }
+
 
     }
 }

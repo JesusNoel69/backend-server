@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BackEnd_Server.Models
 {
@@ -17,6 +18,7 @@ namespace BackEnd_Server.Models
         public int ProjectNumber { get; set; }
         public List<ChangeDetails>? ChangeDetails { get; set; }
         public List<Task>? Tasks { get; set; }
+        [JsonIgnore]
         public Project? Project { get; set; }
     }
 }

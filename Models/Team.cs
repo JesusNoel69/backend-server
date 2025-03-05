@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BackEnd_Server.Models
 {
@@ -11,7 +12,9 @@ namespace BackEnd_Server.Models
         [StringLength(10, ErrorMessage = "La longitud máxima es de 10 caracteres.")]
         public string? Code { get; set; }
         public int ProductOwnerId { get; set; }
+        [JsonIgnore]
         public ProductOwner? ProductOwner { get; set; }
+        [JsonIgnore]
         public List<Developer>? Developers { get; set; }
         public List<TeamProject>? TeamProjects { get; set; }
     }

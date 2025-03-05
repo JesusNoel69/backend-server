@@ -9,12 +9,13 @@ if (string.IsNullOrEmpty(connectionString))
 {
     throw new Exception("DB_CONNECTION_STRING no está configurada en el archivo .env");
 }
+string url = Environment.GetEnvironmentVariable("URL")??"AllowAll";
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
    options.AddPolicy(name:"AllowAngular", policy =>
    {
-       policy.WithOrigins("http://localhost:4200")
+       policy.WithOrigins(url)
              .AllowAnyHeader()
              .AllowAnyMethod();
    });
@@ -26,7 +27,6 @@ builder.Services.AddDbContext<AplicationDbContext>(options=>
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        // Esto preserva los nombres de las propiedades (por ejemplo, "Id" en lugar de "id")
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

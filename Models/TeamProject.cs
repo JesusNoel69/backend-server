@@ -1,4 +1,6 @@
-﻿namespace BackEnd_Server.Models
+﻿using System.Text.Json.Serialization;
+
+namespace BackEnd_Server.Models
 {
     public class TeamProject
     {
@@ -6,6 +8,7 @@
         public Team? Team { get; set; } 
 
         public int ProjectId { get; set; }
+        [JsonIgnore]
         public Project? Project { get; set; }  
     }
 }

@@ -3,6 +3,7 @@ using System;
 using BackEnd_Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd_Server.Migrations
 {
     [DbContext(typeof(AplicationDbContext))]
-    partial class AplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250302023237_AutoGenerateUserId")]
+    partial class AutoGenerateUserId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,9 +160,6 @@ namespace BackEnd_Server.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("DeveloperId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
@@ -177,8 +177,6 @@ namespace BackEnd_Server.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DeveloperId");
 
                     b.HasIndex("ProductBacklogId");
 
@@ -359,10 +357,6 @@ namespace BackEnd_Server.Migrations
 
             modelBuilder.Entity("BackEnd_Server.Models.Task", b =>
                 {
-                    b.HasOne("BackEnd_Server.Models.Developer", "Developer")
-                        .WithMany()
-                        .HasForeignKey("DeveloperId");
-
                     b.HasOne("BackEnd_Server.Models.ProductBacklog", "ProductBacklog")
                         .WithMany("Tasks")
                         .HasForeignKey("ProductBacklogId");
@@ -370,8 +364,6 @@ namespace BackEnd_Server.Migrations
                     b.HasOne("BackEnd_Server.Models.Sprint", "Sprint")
                         .WithMany("Tasks")
                         .HasForeignKey("SprintId");
-
-                    b.Navigation("Developer");
 
                     b.Navigation("ProductBacklog");
 
