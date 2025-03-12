@@ -68,10 +68,13 @@ namespace BackEnd_Server.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        
+        [HttpGet("GetProjectById/{id}")]
         public async Task<ActionResult<Project>> GetProjectById(int id)
         {
-            var project = await _context.Project.FindAsync(id);
+            var project = await _context.Project
+                                .Include(p => p.Sprints)
+                                .FirstOrDefaultAsync(p => p.Id == id);
             if (project == null)
             {
                 return NotFound();

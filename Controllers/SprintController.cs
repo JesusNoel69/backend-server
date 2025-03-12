@@ -46,13 +46,98 @@ namespace BackEnd_Server.Controllers
             }
             return Ok(sprint);
         }
-        [HttpPost("AddSprint")]
-        public async Task<IActionResult> AddSprint([FromBody]Sprint sprint){
+        //eliminar de mi product backlog laa tareas
+        //asignar esas tareas a mi sprint
+        // [HttpPost("AddSprint/{projectId}")]
+        // public async Task<IActionResult> AddSprint([FromBody]Sprint sprint, int projectId){
+
+        //     var productBacklog = await _context.ProductBacklog.Where(product=>product.ProjectId==projectId).FirstOrDefaultAsync();
+        //     var project = await _context.Project.Where(p=>p.Id==projectId).FirstOrDefaultAsync();
+        //     var tasks = await _context.TaskEntity.Where(t=>t.ProductBacklog!=null && productBacklog!=null && t.ProductBacklog.Id==productBacklog.Id).ToListAsync();
+            
+        //     if(productBacklog==null){
+        //         return BadRequest("sin product backlog");
+        //     }
+        //     sprint.Project = project;
+
+        //     if (sprint.Tasks != null)
+        //     {
+        //         System.Console.WriteLine(sprint.Project?.Id);
+        //         foreach(var task in sprint.Tasks)
+        //         {
+        //             productBacklog?.Tasks?.Remove(task);
+        //             _context.TaskEntity.Remove(task);
+        //         }
+        //     }
+
+        //     using var transaction = await _context.Database.BeginTransactionAsync();
+        //     try
+        //     {
+        //         await _context.Sprint.AddAsync(sprint);
+        //         await _context.SaveChangesAsync();
+        //         await transaction.CommitAsync();
+        //     }
+        //     catch (Exception error)
+        //     {
+        //         System.Console.WriteLine(error.Message);
+        //         await transaction.RollbackAsync();
+        //         throw;
+        //     }
+        //     return Ok();
+        // }
+        [HttpPost("AddSprint/{projectId}")]
+        public async Task<IActionResult> AddSprint([FromBody] Sprint sprint, int projectId)
+        {
+            // Recuperar el ProductBacklog (con sus tareas) y el proyecto existentes
+            var productBacklog = await _context.ProductBacklog
+                .Include(pb => pb.Tasks)
+                .FirstOrDefaultAsync(pb => pb.ProjectId == projectId);
+            var project = await _context.Project.FindAsync(projectId);
+
+            if (productBacklog == null || project == null)
+            {
+                return BadRequest("Sin product backlog o proyecto");
+            }
+
+            // Asociar el sprint al proyecto existente
+            sprint.Project = project;
+
+            // Extraer los Ids de las tareas que se desean mover desde el sprint
+            var taskIdsToMove = sprint.Tasks?.Select(t => t.Id).ToList() ?? new List<int>();
+
+            // Evitar que el sprint intente adjuntar las instancias de Task que ya están siendo rastreadas
+            sprint.Tasks = null;
+
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // Insertar el sprint y guardar para que se asigne su Id
                 await _context.Sprint.AddAsync(sprint);
                 await _context.SaveChangesAsync();
+
+                // Si se especificaron tareas para mover...
+                if (taskIdsToMove.Any())
+                {
+                    // Buscar en el backlog (ya rastreado) las tareas cuyos Ids coincidan
+                    var tasksToUpdate = productBacklog.Tasks
+                        .Where(t => taskIdsToMove.Contains(t.Id))
+                        .ToList();
+
+                    foreach (var trackedTask in tasksToUpdate)
+                    {
+                        // Remover la tarea de la colección del backlog
+                        productBacklog.Tasks.Remove(trackedTask);
+                        // Asignar la relación con el sprint: si tienes la propiedad SprintId, se puede asignar directamente
+                        _context.Entry(trackedTask).Property("SprintId").CurrentValue = sprint.Id;
+                        // Desasociar la tarea del backlog
+                        trackedTask.ProductBacklog = null;
+                        // Si tienes ProductBacklogId, asigna null:
+                        // _context.Entry(trackedTask).Property("ProductBacklogId").CurrentValue = null;
+                        _context.TaskEntity.Update(trackedTask);
+                    }
+                    await _context.SaveChangesAsync();
+                }
+
                 await transaction.CommitAsync();
             }
             catch (Exception error)
@@ -61,10 +146,15 @@ namespace BackEnd_Server.Controllers
                 await transaction.RollbackAsync();
                 throw;
             }
-            return Ok();
+            return Ok(sprint);
         }
+        
+       
+    }
+}
 
-        /*
+
+ /*
             [HttpPost("AddSprint")]
             public async Task<IActionResult> AddSprint([FromBody] Sprint sprint)
             {
@@ -102,5 +192,3 @@ namespace BackEnd_Server.Controllers
                 return Ok();
             }
         */
-    }
-}

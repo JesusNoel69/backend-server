@@ -35,6 +35,7 @@ namespace BackEnd_Server.Controllers
             try{
                 Console.WriteLine("developer: "+System.Text.Json.JsonSerializer.Serialize(developer));
                 _context.Attach(developer.Team);
+                // _context.Attach(developer.Team!);
 
                 await _context.Developer.AddAsync(developer);
                 await _context.SaveChangesAsync();

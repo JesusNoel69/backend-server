@@ -138,7 +138,114 @@ namespace BackEnd_Server.Controllers
             return Ok(tasks);
         }
 
+        [HttpPatch("UpdateTaksState")]
+        public async Task<ActionResult<bool>> UpdateTasksState([FromBody] List<Models.Task> tasks )
+        {
+            System.Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(tasks));
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+
+                _context.TaskEntity.UpdateRange(tasks);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }catch(Exception error){
+                System.Console.WriteLine(error.ToString());
+                await transaction.RollbackAsync();
+                return BadRequest();
+            }
+            return Ok();
+        }
+
+        [HttpPatch("UpdateTaksOrder")]
+        public async Task<ActionResult<bool>> UpdateTasksOrder([FromBody] List<Models.Task> tasks )
+        {
+            System.Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(tasks));
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+
+                _context.TaskEntity.UpdateRange(tasks);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }catch(Exception error){
+                System.Console.WriteLine(error.ToString());
+                await transaction.RollbackAsync();
+                return BadRequest();
+            }
+            return Ok();
+        }
+        
+        [HttpPatch("UpdateTasksSprint")]
+        public async Task<ActionResult<bool>> UpdateTasksSprint([FromBody] UpdateTasksSprintDTO payload)
+        {
+            if (payload == null)
+                return BadRequest("Payload is null");
+
+            // Extraer los IDs de las tareas a actualizar
+            var backlogTaskIds = payload.Backlog?.Tasks?.Select(t => t.Id) ?? Enumerable.Empty<int>();
+            var sprintTaskIds = payload.Sprint?.Tasks?.Select(t => t.Id) ?? Enumerable.Empty<int>();
+            var allTaskIds = backlogTaskIds.Union(sprintTaskIds).Distinct().ToList();
+
+            // Obtener las tareas desde la base de datos (estas serán las únicas instancias rastreadas)
+            var tasksToUpdate = await _context.TaskEntity
+                .Where(t => allTaskIds.Contains(t.Id))
+                .ToListAsync();
+
+            // Obtener las instancias únicas de backlog y sprint
+            ProductBacklog backlogEntity = null;
+            if (payload.Backlog != null)
+            {
+                backlogEntity = await _context.ProductBacklog.FirstOrDefaultAsync(x => x.Id == payload.Backlog.BacklogId);
+                if (backlogEntity == null)
+                    return BadRequest("No se encontró el ProductBacklog con el Id proporcionado.");
+            }
+
+            Models.Sprint sprintEntity = null;
+            if (payload.Sprint != null)
+            {
+                sprintEntity = await _context.Sprint.FirstOrDefaultAsync(x => x.Id == payload.Sprint.SprintId);
+                if (sprintEntity == null)
+                    return BadRequest("No se encontró el Sprint con el Id proporcionado.");
+            }
+
+            // Actualizar cada tarea según su presencia en las listas del payload
+            foreach (var task in tasksToUpdate)
+            {
+                if (payload.Backlog?.Tasks?.Any(t => t.Id == task.Id) == true)
+                {
+                    task.ProductBacklog = backlogEntity;
+                    task.Sprint = null;
+                }
+                else if (payload.Sprint?.Tasks?.Any(t => t.Id == task.Id) == true)
+                {
+                    task.Sprint = sprintEntity;
+                    task.ProductBacklog = null;
+                }
+            }
+            System.Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(tasksToUpdate));
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception error)
+            {
+                Console.WriteLine(error.ToString());
+                await transaction.RollbackAsync();
+                return BadRequest();
+            }
+            return Ok(true);
+        }
+
+
+
+
+
 
 
     }
+
+
 }
