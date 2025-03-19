@@ -102,16 +102,28 @@ namespace BackEnd_Server.Controllers
                 return NotFound("No se encontró el Product Backlog especificado.");
             }
 
+            int taskOrder=1;
+            if(productBacklog.Tasks!=null && productBacklog.Tasks.Count>0)
+            {
+                foreach (var item in productBacklog.Tasks)
+                {
+                    if(item.Order>taskOrder){
+                        taskOrder=item.Order;
+                    }
+                }
+                taskOrder++;
+            }
+            var developer = await _context.Developer.FirstOrDefaultAsync(dev => dev.Id==taskDto.DeveloperId);
             // Mapear el DTO a la entidad Task
             var task = new Models.Task
             {
                 Name = taskDto.Name,
                 Description = taskDto.Description,
                 State = taskDto.State,
-                Order = taskDto.Order,
+                Order = taskOrder,
                 ProductBacklog = productBacklog,
                 WeeklyScrums = null,
-                Developer = null // Aquí puedes asignar el Developer buscándolo por taskDto.DeveloperId si lo requieres
+                Developer = developer,
             };
 
             _context.TaskEntity.Add(task);
@@ -238,13 +250,6 @@ namespace BackEnd_Server.Controllers
             }
             return Ok(true);
         }
-
-
-
-
-
-
-
     }
 
 

@@ -36,12 +36,18 @@ namespace BackEnd_Server.Controllers
         [HttpPost("InsertProject")]
         public async Task<ActionResult<Project>> InsertProject([FromBody] Project project)
         {
-            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(project));
-
-            // Aseguramos que la lista TeamProjects no sea nula
+            System.Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(project));
             project.TeamProjects ??= [];
-            
-            // Para cada relación, asignamos la referencia al proyecto
+            int order =1;
+            foreach (var sprint in project.Sprints??[])
+            {
+                foreach (var task in sprint.Tasks??[])
+                {
+                    task.Order=order;
+                    order++;
+                }
+                order=1;
+            }
             foreach (var tp in project.TeamProjects)
             {
                 tp.Project = project;
@@ -51,7 +57,6 @@ namespace BackEnd_Server.Controllers
                 project.ProductBacklog.Project = project;
                  _context.ProductBacklog.Add(project.ProductBacklog);
             }
-
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
@@ -63,7 +68,6 @@ namespace BackEnd_Server.Controllers
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                System.Console.WriteLine(ex.Message);
                 return StatusCode(500, new { message = "Error al insertar el proyecto", error = ex.Message });
             }
         }

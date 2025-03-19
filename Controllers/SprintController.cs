@@ -46,45 +46,7 @@ namespace BackEnd_Server.Controllers
             }
             return Ok(sprint);
         }
-        //eliminar de mi product backlog laa tareas
-        //asignar esas tareas a mi sprint
-        // [HttpPost("AddSprint/{projectId}")]
-        // public async Task<IActionResult> AddSprint([FromBody]Sprint sprint, int projectId){
 
-        //     var productBacklog = await _context.ProductBacklog.Where(product=>product.ProjectId==projectId).FirstOrDefaultAsync();
-        //     var project = await _context.Project.Where(p=>p.Id==projectId).FirstOrDefaultAsync();
-        //     var tasks = await _context.TaskEntity.Where(t=>t.ProductBacklog!=null && productBacklog!=null && t.ProductBacklog.Id==productBacklog.Id).ToListAsync();
-            
-        //     if(productBacklog==null){
-        //         return BadRequest("sin product backlog");
-        //     }
-        //     sprint.Project = project;
-
-        //     if (sprint.Tasks != null)
-        //     {
-        //         System.Console.WriteLine(sprint.Project?.Id);
-        //         foreach(var task in sprint.Tasks)
-        //         {
-        //             productBacklog?.Tasks?.Remove(task);
-        //             _context.TaskEntity.Remove(task);
-        //         }
-        //     }
-
-        //     using var transaction = await _context.Database.BeginTransactionAsync();
-        //     try
-        //     {
-        //         await _context.Sprint.AddAsync(sprint);
-        //         await _context.SaveChangesAsync();
-        //         await transaction.CommitAsync();
-        //     }
-        //     catch (Exception error)
-        //     {
-        //         System.Console.WriteLine(error.Message);
-        //         await transaction.RollbackAsync();
-        //         throw;
-        //     }
-        //     return Ok();
-        // }
         [HttpPost("AddSprint/{projectId}")]
         public async Task<IActionResult> AddSprint([FromBody] Sprint sprint, int projectId)
         {
