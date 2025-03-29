@@ -23,15 +23,58 @@ namespace BackEnd_Server.Controllers
             _context = context;
         }
                 
-        [HttpGet("GetProjects")]
-        public async Task<ActionResult<IEnumerable<Project>>> GetProjects()
+[HttpGet("GetProjects")]
+public async Task<ActionResult<IEnumerable<Project>>> GetProjects([FromQuery] int userId, [FromQuery] bool role)
+{
+    Team? team;
+    TeamProject? teamProject;
+
+    if (role)
+    {
+        // Para ProductOwner
+        team = await _context.Team.FirstOrDefaultAsync(x => x.ProductOwnerId == userId);
+        if (team == null)
         {
-            List<Project> projects = await _context.Project.ToListAsync();
-            if(projects.Count == 0){
-                return NoContent();
-            }
-            return Ok(projects);
+            return BadRequest("Proyectos no encontrados para el team.");
         }
+        teamProject = await _context.TeamProject.FirstOrDefaultAsync(x => x.TeamId == team.Id);
+        if (teamProject == null)
+        {
+            return BadRequest("TeamProject nulo.");
+        }
+    }
+    else
+    {
+        // Incluimos la propiedad Team para el desarrollador
+        var developer = await _context.Developer
+                                      .Include(d => d.Team)
+                                      .FirstOrDefaultAsync(x => x.Id == userId);
+        if (developer == null)
+        {
+            return BadRequest("Usuario sin proyectos nulo.");
+        }
+        if (developer.Team == null)
+        {
+            return BadRequest("El desarrollador no tiene equipo asignado.");
+        }
+        team = developer.Team;
+        teamProject = await _context.TeamProject.FirstOrDefaultAsync(x => x.TeamId == team.Id);
+        if (teamProject == null)
+        {
+            return BadRequest("TeamProject nulo.");
+        }
+    }
+
+    List<Project> projects = await _context.Project
+                                            .Where(x => x.Id == teamProject.ProjectId)
+                                            .ToListAsync();
+    if (projects.Count == 0)
+    {
+        return NoContent();
+    }
+    return Ok(projects);
+}
+
         
         [HttpPost("InsertProject")]
         public async Task<ActionResult<Project>> InsertProject([FromBody] Project project)

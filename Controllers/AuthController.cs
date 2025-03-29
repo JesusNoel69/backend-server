@@ -34,10 +34,10 @@ namespace BackEnd_Server.Controllers
             // Validación simple: buscamos el usuario en la base de datos
             var userExists = _context.User
                 .Where(x => x.Password == login.Password && x.Account == login.Username)
-                .ToList();
+                .FirstOrDefault();//tolist
             
             // Si no se encontró el usuario, se retorna Unauthorized
-            if (userExists.Count() == 0)
+            if (userExists == null)//.count==0
                 return Unauthorized();
             
             // Obtener la clave secreta desde la configuración
@@ -57,7 +57,6 @@ namespace BackEnd_Server.Controllers
                 Subject = new ClaimsIdentity(new[] 
                 {
                     new Claim(ClaimTypes.Name, login.Username)
-                    // Aquí puedes agregar más claims si es necesario
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -66,12 +65,12 @@ namespace BackEnd_Server.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
             
-            return Ok(new { token = tokenString });
+            return Ok(new { token = tokenString, user = userExists });
         }
     }
     public class LoginModel
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
     }
 }

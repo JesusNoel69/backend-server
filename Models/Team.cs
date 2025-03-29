@@ -16,6 +16,7 @@ namespace BackEnd_Server.Models
         public ProductOwner? ProductOwner { get; set; }
         [JsonIgnore]
         public List<Developer>? Developers { get; set; }
+        [JsonIgnore]
         public List<TeamProject>? TeamProjects { get; set; }
     }
 }
