@@ -3,6 +3,7 @@ using System;
 using BackEnd_Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd_Server.Migrations
 {
     [DbContext(typeof(AplicationDbContext))]
-    partial class AplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250407225446_RemoveIndexes")]
+    partial class RemoveIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,13 +28,25 @@ namespace BackEnd_Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("DeveloperId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DeveloperId1")
+                        .HasColumnType("int");
+
                     b.Property<int?>("SprintId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SprintId1")
                         .HasColumnType("int");
 
                     b.Property<int?>("SprintNumber")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TaskId")
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TaskId1")
                         .HasColumnType("int");
 
                     b.Property<string>("TaskInformation")
@@ -42,6 +57,19 @@ namespace BackEnd_Server.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DeveloperId");
+
+                    b.HasIndex("DeveloperId1")
+                        .IsUnique();
+
+                    b.HasIndex("SprintId");
+
+                    b.HasIndex("SprintId1");
+
+                    b.HasIndex("TaskId");
+
+                    b.HasIndex("TaskId1");
 
                     b.ToTable("ChangeDetails");
                 });
@@ -227,9 +255,6 @@ namespace BackEnd_Server.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int?>("ChangeDetailsId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasMaxLength(30)
                         .HasColumnType("varchar(30)");
@@ -242,8 +267,6 @@ namespace BackEnd_Server.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ChangeDetailsId");
 
                     b.ToTable("User");
 
@@ -278,36 +301,6 @@ namespace BackEnd_Server.Migrations
                     b.ToTable("WeeklyScrum");
                 });
 
-            modelBuilder.Entity("ChangeDetailsSprint", b =>
-                {
-                    b.Property<int>("ChangeDetailsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SprintsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ChangeDetailsId", "SprintsId");
-
-                    b.HasIndex("SprintsId");
-
-                    b.ToTable("ChangeDetailsSprint");
-                });
-
-            modelBuilder.Entity("ChangeDetailsTask", b =>
-                {
-                    b.Property<int>("ChangeDetailsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TaskId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ChangeDetailsId", "TaskId");
-
-                    b.HasIndex("TaskId");
-
-                    b.ToTable("ChangeDetailsTask");
-                });
-
             modelBuilder.Entity("BackEnd_Server.Models.Developer", b =>
                 {
                     b.HasBaseType("BackEnd_Server.Models.User");
@@ -328,11 +321,54 @@ namespace BackEnd_Server.Migrations
                 {
                     b.HasBaseType("BackEnd_Server.Models.User");
 
+                    b.Property<int?>("ChangeDetailsId")
+                        .HasColumnType("int");
+
                     b.Property<string>("StakeHolderContact")
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.HasIndex("ChangeDetailsId");
+
                     b.ToTable("ProductOwner", (string)null);
+                });
+
+            modelBuilder.Entity("BackEnd_Server.Models.ChangeDetails", b =>
+                {
+                    b.HasOne("BackEnd_Server.Models.Developer", "Developer")
+                        .WithMany()
+                        .HasForeignKey("DeveloperId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd_Server.Models.Developer", null)
+                        .WithOne("ChangeDetails")
+                        .HasForeignKey("BackEnd_Server.Models.ChangeDetails", "DeveloperId1");
+
+                    b.HasOne("BackEnd_Server.Models.Sprint", "Sprints")
+                        .WithMany()
+                        .HasForeignKey("SprintId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("BackEnd_Server.Models.Sprint", null)
+                        .WithMany("ChangeDetails")
+                        .HasForeignKey("SprintId1");
+
+                    b.HasOne("BackEnd_Server.Models.Task", "Task")
+                        .WithMany()
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd_Server.Models.Task", null)
+                        .WithMany("ChangeDetails")
+                        .HasForeignKey("TaskId1");
+
+                    b.Navigation("Developer");
+
+                    b.Navigation("Sprints");
+
+                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("BackEnd_Server.Models.ProductBacklog", b =>
@@ -406,15 +442,6 @@ namespace BackEnd_Server.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("BackEnd_Server.Models.User", b =>
-                {
-                    b.HasOne("BackEnd_Server.Models.ChangeDetails", "ChangeDetails")
-                        .WithMany()
-                        .HasForeignKey("ChangeDetailsId");
-
-                    b.Navigation("ChangeDetails");
-                });
-
             modelBuilder.Entity("BackEnd_Server.Models.WeeklyScrum", b =>
                 {
                     b.HasOne("BackEnd_Server.Models.Developer", "Developer")
@@ -434,36 +461,6 @@ namespace BackEnd_Server.Migrations
                     b.Navigation("Task");
                 });
 
-            modelBuilder.Entity("ChangeDetailsSprint", b =>
-                {
-                    b.HasOne("BackEnd_Server.Models.ChangeDetails", null)
-                        .WithMany()
-                        .HasForeignKey("ChangeDetailsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BackEnd_Server.Models.Sprint", null)
-                        .WithMany()
-                        .HasForeignKey("SprintsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ChangeDetailsTask", b =>
-                {
-                    b.HasOne("BackEnd_Server.Models.ChangeDetails", null)
-                        .WithMany()
-                        .HasForeignKey("ChangeDetailsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BackEnd_Server.Models.Task", null)
-                        .WithMany()
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("BackEnd_Server.Models.Developer", b =>
                 {
                     b.HasOne("BackEnd_Server.Models.User", null)
@@ -481,11 +478,17 @@ namespace BackEnd_Server.Migrations
 
             modelBuilder.Entity("BackEnd_Server.Models.ProductOwner", b =>
                 {
+                    b.HasOne("BackEnd_Server.Models.ChangeDetails", "ChangeDetails")
+                        .WithMany()
+                        .HasForeignKey("ChangeDetailsId");
+
                     b.HasOne("BackEnd_Server.Models.User", null)
                         .WithOne()
                         .HasForeignKey("BackEnd_Server.Models.ProductOwner", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ChangeDetails");
                 });
 
             modelBuilder.Entity("BackEnd_Server.Models.ProductBacklog", b =>
@@ -504,11 +507,15 @@ namespace BackEnd_Server.Migrations
 
             modelBuilder.Entity("BackEnd_Server.Models.Sprint", b =>
                 {
+                    b.Navigation("ChangeDetails");
+
                     b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("BackEnd_Server.Models.Task", b =>
                 {
+                    b.Navigation("ChangeDetails");
+
                     b.Navigation("WeeklyScrums");
                 });
 
@@ -521,6 +528,8 @@ namespace BackEnd_Server.Migrations
 
             modelBuilder.Entity("BackEnd_Server.Models.Developer", b =>
                 {
+                    b.Navigation("ChangeDetails");
+
                     b.Navigation("WeeklyScrums");
                 });
 

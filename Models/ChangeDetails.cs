@@ -8,22 +8,20 @@ namespace BackEnd_Server.Models
         [Key]
         public int Id { get; set; }
 
-        public int SprintNumber { get; set; }
+        public int? SprintNumber { get; set; }
 
         public string? UserData { get; set; }
 
         [StringLength(150, ErrorMessage = "La longitud máxima es de 150 caracteres.")]
         public string? TaskInformation { get; set; }
 
-  
-        public int UserId { get; set; }  
-        public User? User { get; set; }  
+        public int? TaskId { get; set; }
+        public List<Task>? Task { get; set; } 
 
-        // evitar conflictos con System.Threading.Tasks.Task
-        public int TaskId { get; set; }
-        public Models.Task? TaskEntity { get; set; }
+        // public List<int>? DeveloperId { get; set; }
+        // public List<Developer>? Developer { get; set; } 
+        public int? SprintId { get; set; }
+        public List<Sprint>? Sprints { get; set; }  // Cambié de un solo Sprint a una lista de Sprints
 
-        public int SprintId { get; set; }
-        public Sprint? Sprint { get; set; }
     }
 }

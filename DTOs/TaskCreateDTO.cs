@@ -1,9 +1,12 @@
+using BackEnd_Server.Models;
+
 namespace BackEnd_Server.DTOs
 {
     public class TaskCreateDto
     {
         public string? Name { get; set; }
         public string? Description { get; set; }
+        public string? WeeklyScrum { get; set; }
         public int State { get; set; }
         public int Order { get; set; }  // Puedes asignar un valor por defecto si lo deseas
         
@@ -21,6 +24,19 @@ namespace BackEnd_Server.DTOs
         // Enviar sólo el Id del Developer asignado
         public int? DeveloperId { get; set; }
     }
-
-    // DTO para ChangeDetails (ajusta según tus necesidades)
+    public class TaskWithDeveloperNameDto
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public int State { get; set; }
+        public int Order{ get; set; }
+        public List<ChangeDetails>? ChangeDetails { get; set; }
+        public Sprint? Sprint { get; set; }
+        public ProductBacklog? ProductBacklog { get; set; }
+        public List<WeeklyScrum>? WeeklyScrums { get; set; }
+        public Developer? Developer{ get; set; }
+        public int? DeveloperId { get; set; }
+        public string? DeveloperName { get; set; }  = "No asignado";
+    }
 }

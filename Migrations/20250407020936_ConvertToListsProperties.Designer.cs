@@ -3,6 +3,7 @@ using System;
 using BackEnd_Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd_Server.Migrations
 {
     [DbContext(typeof(AplicationDbContext))]
-    partial class AplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250407020936_ConvertToListsProperties")]
+    partial class ConvertToListsProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,7 +44,14 @@ namespace BackEnd_Server.Migrations
                     b.Property<string>("UserData")
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("ChangeDetails");
                 });
@@ -298,12 +308,12 @@ namespace BackEnd_Server.Migrations
                     b.Property<int>("ChangeDetailsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TaskId")
+                    b.Property<int>("TaskEntitiesId")
                         .HasColumnType("int");
 
-                    b.HasKey("ChangeDetailsId", "TaskId");
+                    b.HasKey("ChangeDetailsId", "TaskEntitiesId");
 
-                    b.HasIndex("TaskId");
+                    b.HasIndex("TaskEntitiesId");
 
                     b.ToTable("ChangeDetailsTask");
                 });
@@ -409,7 +419,7 @@ namespace BackEnd_Server.Migrations
             modelBuilder.Entity("BackEnd_Server.Models.User", b =>
                 {
                     b.HasOne("BackEnd_Server.Models.ChangeDetails", "ChangeDetails")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("ChangeDetailsId");
 
                     b.Navigation("ChangeDetails");
@@ -459,7 +469,7 @@ namespace BackEnd_Server.Migrations
 
                     b.HasOne("BackEnd_Server.Models.Task", null)
                         .WithMany()
-                        .HasForeignKey("TaskId")
+                        .HasForeignKey("TaskEntitiesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -486,6 +496,11 @@ namespace BackEnd_Server.Migrations
                         .HasForeignKey("BackEnd_Server.Models.ProductOwner", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BackEnd_Server.Models.ChangeDetails", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("BackEnd_Server.Models.ProductBacklog", b =>

@@ -58,6 +58,37 @@ namespace BackEnd_Server.Data
                 .HasForeignKey<ProductBacklog>(pb => pb.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);;
 
+           // Relación entre ChangeDetails, Task, Developer, y Sprint
+            // modelBuilder.Entity<ChangeDetails>()
+            //     .HasOne(cd => cd.Task)
+            //     .WithMany() // Asumiendo que Task puede tener varios cambios
+            //     .HasForeignKey(cd => cd.TaskId)
+            //     .OnDelete(DeleteBehavior.Cascade);
+
+            // modelBuilder.Entity<ChangeDetails>()
+            //     .HasOne(cd => cd.Developer)
+            //     .WithMany() // Asumiendo que Developer puede tener varios cambios
+            //     .HasForeignKey(cd => cd.DeveloperId)
+            //     .OnDelete(DeleteBehavior.Cascade);
+
+            // modelBuilder.Entity<ChangeDetails>()
+            //     .HasOne(cd => cd.Sprints)
+            //     .WithMany()
+            //     .HasForeignKey(cd => cd.SprintId)
+            //     .OnDelete(DeleteBehavior.Cascade);
+
+            // modelBuilder.Entity<ChangeDetails>()
+            //     .HasIndex(c => c.DeveloperId)
+            //     .IsUnique(true); // Esto asegura que no haya un índice único en UserId
+
+            // modelBuilder.Entity<ChangeDetails>()
+            //     .HasIndex(c => c.TaskId)
+            //     .IsUnique(true); // Esto asegura que no haya un índice único en TaskId
+
+            // modelBuilder.Entity<ChangeDetails>()
+            //     .HasIndex(c => c.SprintId)
+            //     .IsUnique(true); // Esto asegura que no haya un índice único en SprintId
+
             base.OnModelCreating(modelBuilder);
         }
 

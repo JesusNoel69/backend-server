@@ -9,6 +9,8 @@ namespace BackEnd_Server.Models
         public string? NameSpecialization { get; set; }
         public Team? Team { get; set; }
         public List<WeeklyScrum>? WeeklyScrums { get; set; }
+        // public new List<ChangeDetails>? ChangeDetails { get; set; }
+
 
     }
 }

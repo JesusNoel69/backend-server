@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using BackEnd_Server.Data;
+using BackEnd_Server.DTOs;
 using BackEnd_Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,11 +34,13 @@ public async Task<ActionResult<IEnumerable<Project>>> GetProjects([FromQuery] in
     {
         // Para ProductOwner
         team = await _context.Team.FirstOrDefaultAsync(x => x.ProductOwnerId == userId);
+        System.Console.WriteLine(team);
         if (team == null)
         {
             return BadRequest("Proyectos no encontrados para el team.");
         }
         teamProject = await _context.TeamProject.FirstOrDefaultAsync(x => x.TeamId == team.Id);
+        System.Console.WriteLine(teamProject);
         if (teamProject == null)
         {
             return BadRequest("TeamProject nulo.");
@@ -77,9 +80,23 @@ public async Task<ActionResult<IEnumerable<Project>>> GetProjects([FromQuery] in
 
         
         [HttpPost("InsertProject")]
-        public async Task<ActionResult<Project>> InsertProject([FromBody] Project project)
+        public async Task<ActionResult<Project>> InsertProject([FromBody] ProjectRequestDTO projectRequest)
         {
-            System.Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(project));
+            // System.Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(projectRequest));
+            var project = projectRequest.Project;
+            var userId = projectRequest.UserId;
+            if(project==null){
+                System.Console.WriteLine("nada que crear, proyecto vacio");
+                return Ok("Nada que crear");
+            }
+    
+            var user = await _context.ProductOwner.FindAsync(userId);
+            if (user == null || !user.Rol)  
+            {
+                System.Console.WriteLine("no el product Owner");
+                return BadRequest(new { message = "El usuario no es un ProductOwner" });
+            }
+    
             project.TeamProjects ??= [];
             int order =1;
             foreach (var sprint in project.Sprints??[])
@@ -127,6 +144,26 @@ public async Task<ActionResult<IEnumerable<Project>>> GetProjects([FromQuery] in
                 return NotFound();
             }
             return Ok(project);
+        }
+
+        [HttpGet("GetWeeklyScrumsProductBacklogByProjectId/{id}")]
+        public async Task<ActionResult<Project>> GetWeeklyScrumsProductBacklogByProjectId(int id)
+        {
+            var sprints = await _context.Sprint.Where(sprint=>sprint.Project!.Id == id).ToListAsync();
+            var tasksId = await _context.TaskEntity.Where(task => sprints.Select(x=>x.Id).Contains(task.Sprint!.Id)).Select(task=>task.Id).ToListAsync();
+            System.Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(tasksId));
+
+            var changes = await _context.ChangeDetails.Where(change=>tasksId.Contains(change.Id)).ToListAsync();
+
+            
+
+            // if (project == null)
+            // {
+            //     return NotFound();
+            // }
+
+
+            return Ok();
         }
 
        [HttpGet("GetProductBacklogById/{projectId}")]

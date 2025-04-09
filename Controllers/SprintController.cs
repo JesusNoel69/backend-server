@@ -35,6 +35,18 @@ namespace BackEnd_Server.Controllers
             }
             return Ok(sprints);
         }
+
+       [HttpPost("GetScrumsWeeklyByTaskIds")]
+        public async Task<ActionResult<WeeklyScrum[]>> GetScrumsByTaskIds([FromBody] List<int> taskIds)
+        {
+            var scrums = await _context.WeeklyScrum
+                                    .Where(scrum => taskIds.Contains(scrum.TaskId))
+                                    .ToListAsync();
+
+            return Ok(scrums);
+        }
+
+
         [HttpGet("GetSelectedSprint")]
         public async Task<ActionResult<Sprint>> GetSprint(int sprintId, int projectId){
             var sprint = await _context.Sprint

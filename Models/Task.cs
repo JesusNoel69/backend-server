@@ -18,7 +18,10 @@ namespace BackEnd_Server.Models
         public Sprint? Sprint { get; set; }
         [JsonIgnore]
         public ProductBacklog? ProductBacklog { get; set; }
+        [JsonIgnore]
         public List<WeeklyScrum>? WeeklyScrums { get; set; }
+        [JsonIgnore]
         public Developer? Developer{ get; set; }//agregada
+
     }
 }

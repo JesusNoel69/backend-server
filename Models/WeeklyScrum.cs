@@ -11,7 +11,7 @@ namespace BackEnd_Server.Models
 
         public DateTime CreatedAt { get; set; }
 
-        [StringLength(50, ErrorMessage = "La longitud máxima es de 50 caracteres.")]
+        [StringLength(200, ErrorMessage = "La longitud máxima es de 200 caracteres.")]
         public string? Information { get; set; }
         public int TaskId { get; set; }
         public Task? Task { get; set; } 

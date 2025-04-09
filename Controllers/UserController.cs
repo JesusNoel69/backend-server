@@ -133,7 +133,49 @@ namespace BackEnd_Server.Controllers
             Console.WriteLine("team: "+System.Text.Json.JsonSerializer.Serialize(team));
             return team;
         }
-        
+
+        [HttpPost("GetDevelopersByTasksIds")]
+        public async Task<ActionResult<List<(string DeveloperName, int TaskId)>>> GetDevelopersByTasksIds([FromBody] List<int> Ids)
+        {
+            // Obtener las tareas asociadas a los IDs proporcionados
+            var tasks = await _context.TaskEntity
+                .Where(x => Ids.Contains(x.Id))
+                .Select(x => new 
+                { 
+                    TaskId = x.Id, 
+                    DeveloperName = x.Developer != null ? x.Developer.Name : "Sin asignar"
+                })
+                .ToListAsync();
+
+            // Verificar si hay datos
+            if (tasks.Count == 0)
+            {
+                Console.WriteLine("No hay desarrolladores asignados a estas tareas.");
+                return NotFound("No se encontraron desarrolladores para las tareas proporcionadas.");
+            }
+
+            // Retornar la lista con el nombre del desarrollador y el ID de la tarea
+            return Ok(tasks);
+        }
+        [HttpPost("GetDevelopersByIds")]
+        public async Task<ActionResult<List<Developer>>> GetDevelopersByIds([FromBody] List<int> Ids)
+        {
+            // Obtener las tareas asociadas a los IDs proporcionados
+            var developers = await _context.Developer
+                .Where(x => Ids.Contains(x.Id))
+                .ToListAsync();
+
+            // Verificar si hay datos
+            if (developers.Count == 0)
+            {
+                Console.WriteLine("No hay desarrolladores asignados a estas tareas.");
+                return NotFound("No se encontraron desarrolladores para las tareas proporcionadas.");
+            }
+
+            // Retornar la lista con el nombre del desarrollador y el ID de la tarea
+            return Ok(developers);
+        }
+
         [HttpGet("GetDevelopersByProjectId/{projectId}")]
         public async Task<ActionResult<List<Developer>>> GetDevelopersByProjectId(int projectId)
         {
