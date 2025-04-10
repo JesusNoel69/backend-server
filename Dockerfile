@@ -9,7 +9,7 @@ RUN dotnet restore
 
 WORKDIR /app
 COPY . .
-RUN dotnet publish Backend-Server.csproj -c Release -o /app/publish
+RUN dotnet publish BackEnd-Server.csproj -c Release -o /app/publish
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
