@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-COPY Backend-Server.csproj ./Backend/
+COPY Backend-Server.csproj ./Backend-Server/
 WORKDIR /app/Backend
 RUN dotnet restore
 
