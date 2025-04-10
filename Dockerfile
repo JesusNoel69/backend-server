@@ -19,4 +19,4 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Definir el comando de entrada para ejecutar la aplicación
-ENTRYPOINT ["dotnet", "Backend-Server.dll"]
+ENTRYPOINT ["dotnet", "BackEnd-Server.dll"]
