@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
 # Copiar el archivo .csproj en el contenedor
-COPY Backend-Server.csproj ./Backend-Server/
+COPY BackEnd-Server.csproj ./BackEnd-Server/
 
 WORKDIR /app/Backend-Server
 RUN dotnet restore
