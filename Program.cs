@@ -7,15 +7,19 @@ using System.Text;
 //dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 8.0.0-preview.7.23375.9
 
 var builder = WebApplication.CreateBuilder(args);
-Env.Load();
-var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");//builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(connectionString))
-{
-    throw new Exception("DB_CONNECTION_STRING no está configurada en el archivo .env");
-}
+// Env.Load();
+// var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");//builder.Configuration.GetConnectionString("DefaultConnection");
+// Console.WriteLine("🔎 DB_CONNECTION_STRING: " + connectionString);
+// if (string.IsNullOrEmpty(connectionString))
+// {
+//     throw new Exception("DB_CONNECTION_STRING no está configurada en el archivo .env");
+// }
+
+
 string url = Environment.GetEnvironmentVariable("URL")??"AllowAll";
 var jwtSecret = Environment.GetEnvironmentVariable("JWT")??"";
 var key = Encoding.ASCII.GetBytes(jwtSecret);
+
 
 
 builder.Services.AddAuthentication(options =>
@@ -50,7 +54,7 @@ builder.Services.AddCors(options =>
 
 
 builder.Services.AddDbContext<AplicationDbContext>(options=>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseMySql("server=185.42.105.187;port=3306;database=scrumdb;user=jesusnoel;password=Test.Password", ServerVersion.AutoDetect("server=185.42.105.187;port=3306;database=scrumdb;user=jesusnoel;password=Test.Password")));
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
