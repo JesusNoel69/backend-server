@@ -39,13 +39,15 @@ builder.Services.AddAuthentication(options =>
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
-   options.AddPolicy(name:"AllowAngular", policy =>
-   {
-       policy.WithOrigins(url)
-             .AllowAnyHeader()
-             .AllowAnyMethod();
-   });
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy
+            .WithOrigins("https://lucky-cendol-dda481.netlify.app")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 });
+
 
 builder.Services.AddDbContext<AplicationDbContext>(options=>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
