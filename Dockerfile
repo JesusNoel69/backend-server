@@ -4,7 +4,7 @@ WORKDIR /app
 # Copiar el archivo .csproj en el contenedor
 COPY BackEnd-Server.csproj ./BackEnd-Server/
 
-WORKDIR /app/Backend-Server
+WORKDIR /app/BackEnd-Server
 RUN dotnet restore
 
 WORKDIR /app
