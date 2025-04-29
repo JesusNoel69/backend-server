@@ -412,7 +412,88 @@ namespace BackEnd_Server.Controllers
             }
         }
 
-        
+        [HttpPatch("UpdateTaskInProductBacklog")]
+        public async Task<ActionResult<ProductBacklog>> UpdateTaskInProductBacklog([FromBody] TaskUpdateDto dto)
+        {
+            if (dto == null || dto.Id <= 0)
+                return BadRequest("Datos inválidos.");
+
+            // 1) Recuperar la tarea con su ProductBacklog
+            var task = await _context.TaskEntity
+                .Include(t => t.ProductBacklog)
+                .FirstOrDefaultAsync(t => t.Id == dto.Id);
+
+            if (task == null)
+                return NotFound("Tarea no encontrada.");
+
+            // 2) Actualizar campos
+            task.Name        = dto.Name;
+            task.Description = dto.Description;
+            task.State       = dto.State;
+            // Order no se modifica para mantener huecos
+
+            // 3) Cambiar responsable si viene DeveloperId
+            if (dto.DeveloperId.HasValue)
+            {
+                var dev = await _context.Developer.FindAsync(dto.DeveloperId.Value);
+                task.Developer  = dev;
+            }
+
+            // 4) Si enviaron un texto de WeeklyScrum, guardamos un nuevo registro
+            if (!string.IsNullOrWhiteSpace(dto.WeeklyScrum))
+            {
+                var weekly = new WeeklyScrum
+                {
+                    CreatedAt     = DateTime.Now,
+                    Information   = dto.WeeklyScrum,
+                    TaskId        = task.Id,
+                    DeveloperId   = dto.DeveloperId ?? task.Developer?.Id ?? 0
+                };
+                _context.WeeklyScrum.Add(weekly);
+            }
+
+            await _context.SaveChangesAsync();
+
+            // 5) Recargar el backlog para devolverlo actualizado
+            var updatedBacklog = await _context.ProductBacklog
+                .Include(pb => pb.Tasks)
+                .FirstOrDefaultAsync(pb => pb.Id == task.ProductBacklog.Id);
+
+            return Ok(updatedBacklog!);
+        }
+
+        [HttpPost("UpdateTask")]
+        public async Task<IActionResult> UpdateTask([FromBody] UpdateTaskDTO dataTask){
+            var task = dataTask.Task;
+            var userId=dataTask.UserId;
+            var taskToUpdate = await _context.TaskEntity.FindAsync(dataTask?.Task?.Id);
+            var userToAsign = await _context.Developer.FindAsync(dataTask?.UserId);
+
+            taskToUpdate!.Description = task!.Description;
+            taskToUpdate!.Name = task!.Name;
+            taskToUpdate!.State = task!.State;
+            taskToUpdate!.Developer=userToAsign;
+            System.Console.WriteLine("este es el resultado: ",System.Text.Json.JsonSerializer.Serialize(taskToUpdate));
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpDelete("DeleteTaskById")]
+        public async Task<IActionResult> DeleteTaskById([FromQuery] int id)
+        {
+            // 1) Busca la tarea
+            var task = await _context.TaskEntity.FindAsync(id);
+            if (task == null)
+                return NotFound();
+
+            // 2) Elimínala
+            _context.TaskEntity.Remove(task);
+            await _context.SaveChangesAsync();
+
+            // 3) Devolver NoContent (la lista se recargará desde el cliente)
+            return NoContent();
+        }
+
         [HttpPatch("UpdateTasksSprint")]
         public async Task<ActionResult<bool>> UpdateTasksSprint([FromBody] UpdateTasksSprintDTO payload)
         {

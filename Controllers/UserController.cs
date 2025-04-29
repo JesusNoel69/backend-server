@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using BackEnd_Server.Data;
+using BackEnd_Server.DTOs;
 using BackEnd_Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -193,6 +194,50 @@ namespace BackEnd_Server.Controllers
                 return BadRequest("no team");
             }
             return developers;
+        }
+
+        [HttpGet("GetUserData")]
+        public async Task<ActionResult<UserData>> GetUserData(int userId){
+            var user = await _context.User.Select(x=>new{
+                Name = x.Name,
+                Id = x.Id,
+                Account = x.Account,
+                Rol = x.Rol
+            }).FirstOrDefaultAsync(y => y.Id==userId);
+
+            string? informationAdditional;
+            int? teamId;
+            
+            if(user!.Rol){
+                informationAdditional = await _context.ProductOwner
+                    .Where(po => po.Id == userId)
+                    .Select(po => po.StakeHolderContact)
+                    .FirstOrDefaultAsync();
+                teamId = await _context.Team
+                    .Where(t => t.ProductOwnerId == userId)
+                    .Select(t => t.Id)
+                    .FirstOrDefaultAsync();
+
+            }else{
+                informationAdditional = await _context.Developer
+                    .Where(po => po.Id == userId)
+                    .Select(po => po.NameSpecialization)
+                    .FirstOrDefaultAsync();
+                teamId = await _context.Developer
+                    .Where(dev => dev.Id == userId)
+                    .Select(dev => dev.Id)
+                    .FirstOrDefaultAsync();   
+            }
+
+            var data = new UserData(){
+                UserName = user.Name,
+                IdUser = user.Id,
+                InformationAditional=informationAdditional,
+                TeamId= teamId,
+                UserAccount=user.Account
+            };
+            System.Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(data));
+            return Ok(data);
         }
 
         [HttpGet("GetTeamsByProductOwnerId/{productOwnerId}")]

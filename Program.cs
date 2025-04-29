@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using DotNetEnv;
 using System.Text;
+using BackEnd_Server.Controllers;
+using BackEnd_Server.Services;
 //dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 8.0.0-preview.7.23375.9
 
 var builder = WebApplication.CreateBuilder(args);
-// Env.Load();
+Env.Load(); //quitar en produccion
 // var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");//builder.Configuration.GetConnectionString("DefaultConnection");
 // Console.WriteLine("🔎 DB_CONNECTION_STRING: " + connectionString);
 // if (string.IsNullOrEmpty(connectionString))
@@ -46,7 +48,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAngular", policy =>
     {
         policy
-            .WithOrigins("https://lucky-cendol-dda481.netlify.app")
+            .WithOrigins(["https://lucky-cendol-dda481.netlify.app", "http://localhost:4200"])
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -62,6 +64,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddScoped<SecurityScannerService>();  
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

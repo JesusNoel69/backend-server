@@ -1,0 +1,27 @@
+[
+  {
+    "RuleId": "HardcodedConnectionString",
+    "Pattern": "(?i)UseMySql\\s*\\(\\s*\"[^\"]+\"\\s*,",
+    "Description": "Cadena de conexión MySQL hardcodeada en el código"
+  },
+  {
+    "RuleId": "HardcodedSqlPassword",
+    "Pattern": "(?i)password\\s*(?<!=)=(?!=)\\s*['\"][^'\"]+['\"]",
+    "Description": "Contraseña de base de datos hardcodeada en literal"
+  },
+  {
+    "RuleId": "HardcodedJwtSecretFallback",
+    "Pattern": "(?i)Environment\\.GetEnvironmentVariable\\(\"JWT\"\\)\\s*\\?\\?\\s*['\"][^'\"]+['\"]",
+    "Description": "Valor por defecto de JWT secreto hardcodeado"
+  },
+  {
+    "RuleId": "HardcodedCorsOrigins",
+    "Pattern": "\\.WithOrigins\\s*\\(\\s*\\[.*?\\]\\s*\\)",
+    "Description": "Orígenes CORS definidos directamente en código en lugar de configuración externa"
+  },
+  {
+    "RuleId": "HardcodedUrlFallback",
+    "Pattern": "(?i)Environment\\.GetEnvironmentVariable\\(\"URL\"\\)\\s*\\?\\?\\s*['\"][^'\"]+['\"]",
+    "Description": "Valor por defecto de URL hardcodeado"
+  }
+]
