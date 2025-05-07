@@ -11,7 +11,7 @@ using BackEnd_Server.Services;
 var builder = WebApplication.CreateBuilder(args);
 Env.Load(); //quitar en produccion
 // var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");//builder.Configuration.GetConnectionString("DefaultConnection");
-// Console.WriteLine("🔎 DB_CONNECTION_STRING: " + connectionString);
+// Console.WriteLine("DB_CONNECTION_STRING: " + connectionString);
 // if (string.IsNullOrEmpty(connectionString))
 // {
 //     throw new Exception("DB_CONNECTION_STRING no está configurada en el archivo .env");

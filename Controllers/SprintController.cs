@@ -59,6 +59,18 @@ namespace BackEnd_Server.Controllers
             return Ok(sprint);
         }
 
+        [HttpPatch("UpdateStateSprint/{id}")]
+            public async Task<ActionResult> UpdateStateSprint([FromRoute] int id)
+            {
+                var sprint = await _context.Sprint.FirstOrDefaultAsync(s => s.Id == id);
+                if (sprint != null)
+                {
+                    sprint.State = 1;
+                    await _context.SaveChangesAsync();
+                }
+                return Ok();
+            }
+
         [HttpPost("AddSprint/{projectId}")]
         public async Task<IActionResult> AddSprint([FromBody] Sprint sprint, int projectId)
         {
